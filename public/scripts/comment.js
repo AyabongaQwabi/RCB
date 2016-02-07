@@ -22,10 +22,16 @@ var Comment = React.createClass({
 var CommentList = React.createClass({
 
 	render:function(){
+		var commentNodes = this.props.data.map(function(comment){
+			return (
+				<Comment author={comment.author} key={comment.id}> {comment.text} </Comment>
+			)
+		})
+		
 		return (
 			<div className='commentList'>
-				<Comment author='Ayanai'> Jahman Rastafarai ! </Comment>
-				<Comment author='Thandi'> I knew it ...they are together </Comment>
+				{commentNodes}
+				
 			</div>
 		);
 	}
@@ -39,16 +45,20 @@ var CommentForm = React.createClass({render:function(){
 	)
 }})
 
+var data = [
+  {id: 1, author: "Pete Hunt", text: "This is one comment"},
+  {id: 2, author: "Jordan Walke", text: "This is *another* comment"}
+];
 var CommentBox = React.createClass({render:function(){
 
 	return (
 			 <div className='commentBox'>
 				<h1 className='flow-text'> Comments </h1>
-				<CommentList />
+				<CommentList data={this.props.data}/>
 				<CommentForm />
 			 </div>
 	);
 
 }})
 
-ReactDOM.render( <CommentBox /> , document.getElementById('content') )
+ReactDOM.render( <CommentBox data={data}/> , document.getElementById('content') )

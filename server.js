@@ -14,6 +14,15 @@ var fs = require('fs');
 var path = require('path');
 var express = require('express');
 var bodyParser = require('body-parser');
+var mysql = require('mysql')
+var myConnection = require('express-myconnection')
+var databaseOptions = {
+    user:'root',
+    host:'localhost',
+    password:'theaya5379',
+    database:'rcb',
+    port:3306
+}
 var app = express();
 
 var COMMENTS_FILE = path.join(__dirname, 'comments.json');
@@ -23,6 +32,7 @@ app.set('port', (process.env.PORT || 3000));
 app.use('/', express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(myConnection(mysql,databaseOptions))
 
 // Additional middleware which will set headers that we need on each request.
 app.use(function(req, res, next) {
@@ -36,17 +46,37 @@ app.use(function(req, res, next) {
 });
 
 app.get('/api/comments', function(req, res) {
+
+      var connection = mysql.createConnection(databaseOptions)
+      connection.query('select * from comments,users where comments.user_id =users.id',function(err,data){
+          if(err)console.log('ERR:\t'+err)
+          res.json(JSON.parse(data));
+      })
+
+  /*
   fs.readFile(COMMENTS_FILE, function(err, data) {
     if (err) {
       console.error(err);
       process.exit(1);
     }
     res.json(JSON.parse(data));
-  });
+  });*/
 });
 
 app.post('/api/comments', function(req, res) {
-  fs.readFile(COMMENTS_FILE, function(err, data) {
+
+  var newComment = {
+      user_id: 3,
+      text: req.body.text,
+    };
+  var connection = mysql.createConnection(databaseOptions)
+  connection.query('insert into comments set ?',newComment,function(err,data){
+          //res.json(JSON.parse(data));
+          if(err)console.log('ERR:\t'+err)
+          res.send('done')
+  })
+
+  /*fs.readFile(COMMENTS_FILE, function(err, data) {
     if (err) {
       console.error(err);
       process.exit(1);
@@ -68,7 +98,7 @@ app.post('/api/comments', function(req, res) {
       }
       res.json(comments);
     });
-  });
+  });*/
 });
 
 
