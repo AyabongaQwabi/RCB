@@ -24,7 +24,7 @@ var databaseOptions = {
     port:3306
 }
 var app = express();
-
+var consMade=0;
 var COMMENTS_FILE = path.join(__dirname, 'comments.json');
 
 app.set('port', (process.env.PORT || 3000));
@@ -46,14 +46,14 @@ app.use(function(req, res, next) {
 });
 
 app.get('/api/comments', function(req, res) {
-      console.log('REQUESTING COMMENTS')
+  
       var connection = mysql.createConnection(databaseOptions)
       connection.query('select  comments.id,comments.comment,users.name,users.tagline ,users.img from comments,users where comments.user_id =users.id',function(err,data){
           if(err)console.log('ERR:\t'+err)
-          console.log(data)
+          //console.log(data)
           res.json(data);
       })
-
+      connection.end();
   /*
   fs.readFile(COMMENTS_FILE, function(err, data) {
     if (err) {
@@ -65,18 +65,34 @@ app.get('/api/comments', function(req, res) {
 });
 
 app.post('/api/comments', function(req, res) {
-
+    console.log('new comment')
   var newComment = {
-      user_id: 3,
-      text: req.body.text,
+      user_id:0,
+      comment: req.body.comment
     };
+  var newUser={
+     name:req.body.author
+  }
   var connection = mysql.createConnection(databaseOptions)
-  connection.query('insert into comments set ?',newComment,function(err,data){
-          //res.json(JSON.parse(data));
+  connection.query('insert into users set ?',newUser,function(err,data){
           if(err)console.log('ERR:\t'+err)
-          res.send('done')
-  })
+          console.log('user inserted first')
+          connection.query('select id from users where name = ?',req.body.author,function(err,data){
+             if(err)console.log('ERR:\t'+err)
+              console.log('then comment')
+              newComment.user_id =data[0].id
+              console.log(newComment)
+              connection.query('insert into comments set = ?',newComment,function(err,data){
 
+                    if(err)console.log('ERR:\t'+err)
+                    console.log('Done Everything')
+
+              })
+          })
+  })
+     
+          
+connection.end();
   /*fs.readFile(COMMENTS_FILE, function(err, data) {
     if (err) {
       console.error(err);
