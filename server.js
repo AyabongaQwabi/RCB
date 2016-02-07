@@ -46,11 +46,12 @@ app.use(function(req, res, next) {
 });
 
 app.get('/api/comments', function(req, res) {
-
+      console.log('REQUESTING COMMENTS')
       var connection = mysql.createConnection(databaseOptions)
-      connection.query('select * from comments,users where comments.user_id =users.id',function(err,data){
+      connection.query('select  comments.id,comments.comment,users.name,users.tagline ,users.img from comments,users where comments.user_id =users.id',function(err,data){
           if(err)console.log('ERR:\t'+err)
-          res.json(JSON.parse(data));
+          console.log(data)
+          res.json(data);
       })
 
   /*

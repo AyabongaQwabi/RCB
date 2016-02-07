@@ -4,16 +4,17 @@ var Comment = React.createClass({
 
 		return (
 			<div className='comment col s12 m12'>
-			 	<div className='col s4 m4 waves-effect waves-light'>
-					<h5  className='commentAuthor'>
-						{this.props.author}
-					</h5>
-				</div>
-				<div className='col s8 m8 blue lighten-4'>
-					
-					<h6>{this.props.children}</h6>
-					
-				</div>
+			 	<div className='grey row'>
+			 	    <span className='col s2 m4'>
+			 	    	<img src={this.props.image} className='cirle btn-floating '></img>
+						<p  className='commentAuthor chip grey '>
+							{this.props.author}
+						</p>
+					</span>
+					<div className='col s8 m8'>
+						<p>{this.props.children}</p>
+					</div>
+				</div>			
 			</div>
 		);
 	}
@@ -22,9 +23,10 @@ var Comment = React.createClass({
 var CommentList = React.createClass({
 
 	render:function(){
-		var commentNodes = this.props.data.map(function(comment){
+		
+		var commentNodes = this.props.userComments.map(function(comment){
 			return (
-				<Comment author={comment.author} key={comment.id}> {comment.text} </Comment>
+				<Comment author={comment.name} key={comment.id} image={comment.img}> {comment.comment} </Comment>
 			)
 		})
 		
@@ -45,20 +47,37 @@ var CommentForm = React.createClass({render:function(){
 	)
 }})
 
-var data = [
-  {id: 1, author: "Pete Hunt", text: "This is one comment"},
-  {id: 2, author: "Jordan Walke", text: "This is *another* comment"}
-];
-var CommentBox = React.createClass({render:function(){
 
-	return (
-			 <div className='commentBox'>
-				<h1 className='flow-text'> Comments </h1>
-				<CommentList data={this.props.data}/>
-				<CommentForm />
-			 </div>
-	);
+var CommentBox = React.createClass({
+	getInitialState:function(){
+		return {commentsMap:[]}
+	},
+	componentDidMount:function(){
+		$.ajax({
+			url:this.props.url,
+			dataType:'json',
+			cache:false,
+			success:function(data){
+				console.log('Data fetched from server ')
+				console.log(data)
+				this.setState({commentsMap:data})
+			}.bind(this),
+			error: function(xhr, status, err) {
+		        console.error(this.props.url, status, err.toString());
+		    }.bind(this)
+		});
+	},
+	render:function(){
+		return (
+				 <div className='commentBox'>
+					<h1 className='flow-text'> Comments </h1>
+					<CommentList userComments = {this.state.commentsMap}/>
+					<CommentForm />
+				 </div>
+		);
 
-}})
+	}
 
-ReactDOM.render( <CommentBox data={data}/> , document.getElementById('content') )
+})
+
+ReactDOM.render( <CommentBox url='/api/comments' /> , document.getElementById('content') )
