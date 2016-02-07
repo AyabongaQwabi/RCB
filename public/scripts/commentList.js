@@ -1,11 +1,14 @@
-var CommentList = React.createClass({render:function(){
+var CommentList = React.createClass({
 
+	render:function(){
 		return (
 			<div className='commentList'>
-				Hey there I am a CommentList
+				<Comment author='Ayanai'> Jahman Rastafarai ! </Comment>
+				<Comment author='Thandi'> I knew it ...they are together </Comment>
 			</div>
-		)
-}})
+		);
+	}
+})
 
 var CommentForm = React.createClass({render:function(){
 	return (
