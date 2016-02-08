@@ -123,15 +123,18 @@ app.post('/api/comments', function(req, res) {
   });*/
 });
 app.get('/join',function(req,res){
+    console.log()
     res.sendFile('/signup.html')
 })
 app.get('/signup',function(req,res){
     var story = {story:"With our new systems you enjoy the comfort of coding from home "}
     res.json(story)
 })
-app.post('/signup',function(){
-    var details = req.body;
-    var connection = mysql.createConnection(mysql,databaseOptions)
+app.post('/signup',function(req,res){
+    var details = {name:req.body.name};
+
+    console.log(details)
+    var connection = mysql.createConnection(databaseOptions)
     connection.query('insert into users set ?',details,function(err,results){
         if(err)console.log(err)
         console.log('Done')

@@ -48,10 +48,11 @@ var SignupForm = React.createClass({ //Data Posting & Events
 	},
 	render:function(){
 		return (
+			
 			<form onSubmit={this.sendForm}>
-				<input type='text' onChange={this.getName} placeholder='your Name' className='required validate'>
-				<input type='text' onChange={this.getEmail} placeholder='your email' className='required validate'>
-				<input type='submit' value='Send' className='btn-large white' onSubmit={this.sendForm}>
+				<input type='text' onChange={this.getName} placeholder='your Name' className='required validate' />
+				<input type='text' onChange={this.getEmail} placeholder='your email' className='required validate' />
+				<input type='submit' value='Send' className='btn-large white' />
 			</form>
 
 		)
