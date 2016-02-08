@@ -39,16 +39,43 @@ var CommentList = React.createClass({
 	}
 })
 
-var CommentForm = React.createClass({render:function(){
-	return (
-		<div className='commentForm'>
-			<form className="commentForm"  onSubmit={this.sendComment}>
-		        <input type="text" placeholder="Your name" className='center orange black-text flow-text' value={this.author} onChange={this.newAuthor} />
-		        <input type="text" placeholder="Say something..." className='center orange black-text' value={this.comment} onChange={this.newComment} />
-		        <input type="submit" value="Post" className='btn-large center blue'/>
-		    </form>
-		</div>
-	)
+var CommentForm = React.createClass({
+	getInitialState:function(){
+		return ({author:'',comment:''})
+	},
+	newAuthor:function(e){
+		this.setState({author:e.target})
+
+	},
+	newComment:function(e){
+		this.setState({comment:e.target})
+	},
+	sendComment: function(e) {
+		console.log('preparing comment for server post')
+	    e.preventDefault();
+	    var author = this.state.author.value.trim();
+	    var text = this.state.comment.value.trim();
+	    if (!text || !author) {
+	      console.log('author '+author+' comment'+text)
+	      console.log('something empty !')
+	      return;
+	    }
+	    this.props.onCommentSubmit({author:author,comment:text})
+	    this.state.author.value='';
+	    this.state.comment.value='';
+	    //this.setState({author: '', comment: ''});
+    },
+	render:function(){
+
+		return (
+			<div className='commentForm'>
+				<form className="commentForm"  onSubmit={this.sendComment} >
+			        <input type="text" placeholder="Your name" className='center orange black-text flow-text' value={this.author} onChange={this.newAuthor} />
+			        <input type="text" placeholder="Say something..." className='center orange black-text' value={this.comment} onChange={this.newComment} />
+			        <input type="submit" value="Post" className='btn-large center blue'/>
+			    </form>
+			</div>
+		)
 }})
 
 
@@ -59,8 +86,8 @@ var CommentBox = React.createClass({
 			dataType:'json',
 			cache:false,
 			success:function(data){
-				console.log('Data fetched from server ')
-				console.log(data)
+				//console.log('Data fetched from server ')
+				//console.log(data)
 				this.setState({commentsMap:data})
 			}.bind(this),
 			error: function(xhr, status, err) {
@@ -71,32 +98,30 @@ var CommentBox = React.createClass({
 	getInitialState:function(){
 		return {commentsMap:[],author:'',comment:''}
 	},
-	newAuthor:function(e){
-		this.setState({author:e.target.value})
-
-	},
-	newComment:function(e){
-		this.setState({comment:e.target.value})
-	},
-	sendComment: function(e) {
-	    e.preventDefault();
-	    var author = this.state.author.trim();
-	    var text = this.state.text.trim();
-	    if (!text || !author) {
-	      return;
-	    }
-	    this.setState({author: '', text: ''});
-  },
 	componentDidMount:function(){
 		this.loadComments();
 		setInterval(this.loadComments,this.props.pollInteerval)
+	},
+	commentSubmitHandler : function(comment){
+			console.log('submiting comment to server')
+			$.ajax({
+				type:"POST",
+				url:this.props.url,
+				data:comment,
+				success:function(response){
+					this.setState({commentsMap:response})
+				}.bind(this),
+				error:function(xhr,status,err){
+					console.error(this.props.url, status, err.toString());
+				}.bind(this)
+			})
 	},
 	render:function(){
 		return (
 				 <div className='commentBox'>
 					<h1 className='flow-text center'> Comments </h1>
 					<CommentList userComments = {this.state.commentsMap}/>
-					<CommentForm />
+					<CommentForm onCommentSubmit={this.commentSubmitHandler}/>
 				 </div>
 		);
 

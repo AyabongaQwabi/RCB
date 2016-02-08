@@ -82,17 +82,22 @@ app.post('/api/comments', function(req, res) {
               console.log('then comment')
               newComment.user_id =data[0].id
               console.log(newComment)
-              connection.query('insert into comments set = ?',newComment,function(err,data){
+              connection.query('insert into comments set ?',newComment,function(err,data){
 
                     if(err)console.log('ERR:\t'+err)
                     console.log('Done Everything')
-
+                    connection.query('select  comments.id,comments.comment,users.name,users.tagline ,users.img from comments,users where comments.user_id =users.id',function(err,data){
+                      if(err)console.log('ERR:\t'+err)
+                      //console.log(data)
+                      res.json(data);
+                      connection.end();
+                  })
               })
           })
   })
      
           
-connection.end();
+
   /*fs.readFile(COMMENTS_FILE, function(err, data) {
     if (err) {
       console.error(err);
