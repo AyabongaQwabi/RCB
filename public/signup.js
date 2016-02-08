@@ -1,4 +1,4 @@
-var SignupInfo = React.createClass({
+var SignupInfo = React.createClass({ //Data Retrieval
 		whenLoad:function(){
 			return ({signupStory:''})
 		},
@@ -8,6 +8,10 @@ var SignupInfo = React.createClass({
 				type:'GET',
 				success:function(data){
 					this.setState({signupStory:data.story})
+				}.bind(this),
+				error:function(err){
+					console.log(err)
+					this.setState({signupStory:'Please check your connection'})
 				}.bind(this)
 			})
 		},
@@ -20,7 +24,7 @@ var SignupInfo = React.createClass({
 		}
 })
 
-var SignupForm = React.createClass({
+var SignupForm = React.createClass({ //Data Posting & Events
 	whenLoad:function(){
 		this.setState({name:'',email:''})
 	},
@@ -44,7 +48,7 @@ var SignupForm = React.createClass({
 	},
 	render:function(){
 		return (
-			<form>
+			<form onSubmit={this.sendForm}>
 				<input type='text' onChange={this.getName} placeholder='your Name' className='required validate'>
 				<input type='text' onChange={this.getEmail} placeholder='your email' className='required validate'>
 				<input type='submit' value='Send' className='btn-large white' onSubmit={this.sendForm}>
@@ -53,3 +57,29 @@ var SignupForm = React.createClass({
 		)
 	}
 })
+
+var SignupBox = React.createClass({
+		serverSubmit:function(details){
+			$.ajax({
+				url:this.props.url,
+				type:'POST',
+				data:details,
+				success:function(data){
+					alert('Successful Sign up!') //redirect here later
+				}.bind(this),
+				error:function(err){
+					console.log(err)
+					this.setState({signupStory:'Please check your connection'})
+				}.bind(this)
+			})
+		},
+		render:function(){
+			return(
+
+				<SignupInfo url = {this.props.url}></SignupInfo>
+				<SignupForm submitForm ={this.serverSubmit} ></SignupForm>
+			)
+		}
+})
+
+ReactDOM.render(<SignupBox url='/signup' />,document.getElementById('new-user'))

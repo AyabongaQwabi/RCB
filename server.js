@@ -122,12 +122,14 @@ app.post('/api/comments', function(req, res) {
     });
   });*/
 });
-
-app.get('signup',function(req,res){
+app.get('/join',function(req,res){
+    res.sendFile('/signup.html')
+})
+app.get('/signup',function(req,res){
     var story = {story:"With our new systems you enjoy the comfort of coding from home "}
     res.json(story)
 })
-app.post('signup',function(){
+app.post('/signup',function(){
     var details = req.body;
     var connection = mysql.createConnection(mysql,databaseOptions)
     connection.query('insert into users set ?',details,function(err,results){
