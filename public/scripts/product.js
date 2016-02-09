@@ -12,7 +12,7 @@ var Product = React.createClass({
 	render:function(){
 		return(
 			<tr>
-				<td>{this.props.product.name}<td>
+				<td>{this.props.product.name}</td>
 				<td>{this.props.product.price}</td>
 			</tr>
 		)
@@ -22,7 +22,7 @@ var Product = React.createClass({
 var Category = React.createClass({	
 	render:function(){
 		return (
-			<tr><td>{this.props.name}</td></tr>
+			<tr><td className='chip'>{this.props.category}</td></tr>
 		)
 	}
 })
@@ -32,21 +32,23 @@ var ProductsTable = React.createClass({
 	render:function(){
 		var ProductsInCategories =[]
 		this.props.categories.forEach(function(category){
-				ProductsInCategories.push(<Category name={category.name} />)
+				ProductsInCategories.push(<Category category={category.name} />)
 				category.products.forEach(function(product){
 					ProductsInCategories.push(<Product product={product} />)
 				})
 		})
-
-		<table>
-			<thead> 
-				<td>Name</td>
-				<td>Price</td>
-			</thead>
-			<tbody> 
-				{ProductsInCategories}
-			</tobody>
-		</table>
+		return (
+				<table className='table'>
+					<thead> 
+						<td><b>Name</b></td>
+						<td><b>Price</b></td>
+					</thead>
+					<tbody> 
+						{ProductsInCategories}
+					</tbody>
+				</table>
+		)
+		
 	}
 })
 
@@ -56,27 +58,31 @@ var FindProductBox = React.createClass({
 	},
 	render :function(){
 		    var categories ={}
-			raw_products.forEach(function(product){
+			this.props.unsortedProductList.forEach(function(product){
 				if(categories[product.category]==undefined)
 				{	
 					var category=product.category;
 					delete product.category;
-					categories[category]={products:[product],name:product.category}
+					categories[category]={products:[product],name:category}
 				}
 				else{
 					categories[product.category].products.push(product)
 				}
 			})
 			var categoryList = [];
-			for(category in categories){
-				categoryList.push(category)
+			for(var category in categories){
+				categoryList.push(categories[category])
 			}
+			console.log("Category List")
+			console.log(categoryList)
 			return(
 				<div className='filterbox'>
-					<input type='text' onChange={findProduct} />
-					<ProductsTable categories ={_categoryList} />
+					<input type='text' className='center white' placeholder='type to search' onChange={this.findProduct} />
+					<ProductsTable categories ={categoryList} />
 				</div>
 			)
 
 	}
 })
+
+ReactDOM.render(<FindProductBox unsortedProductList={raw_products} />,document.getElementById('content'))
