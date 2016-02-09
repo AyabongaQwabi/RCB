@@ -10,9 +10,14 @@ var raw_products =[
 
 var Product = React.createClass({
 	render:function(){
+		var name = this.props.product.stocked ?
+			this.props.product.name:
+				<span>
+					{this.props.product.name} <small className='white-text'><i> Not In Stock</i></small>
+				</span>
 		return(
 			<tr>
-				<td>{this.props.product.name}</td>
+				<td>{name}</td>
 				<td>{this.props.product.price}</td>
 			</tr>
 		)
